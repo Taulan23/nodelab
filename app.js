@@ -54,9 +54,50 @@ app.get('/', (req, res) => {
 
 // Обработка POST-запроса от формы бронирования
 app.post('/submit', (req, res) => {
-    // Просто отправляем успешный ответ, без сохранения файла
-    res.status(200).json({ 
-        message: 'Данные успешно отправлены. Теперь вы можете скачать файл'
+    const {
+        userName,
+        pass,
+        email,
+        people,
+        room,
+        services,
+        meal,
+        calendar,
+        city,
+        abstracts,
+        mailing
+    } = req.body;
+
+    // Создаем имя файла с текущей датой
+    const fileName = `booking_${Date.now()}.txt`;
+    const filePath = path.join(downloadsDir, fileName);
+
+    // Формируем строку для записи в файл
+    const dataToWrite = `
+=== Бронирование от ${new Date().toLocaleString()} ===
+Имя: ${userName || 'Не указано'}
+Email: ${email || 'Не указано'}
+Количество человек: ${people || 'Не указано'}
+Тип номера: ${room || 'Не указано'}
+Услуги в номер: ${Array.isArray(services) ? services.join(', ') : services || 'Не выбраны'}
+Питание: ${Array.isArray(meal) ? meal.join(', ') : meal || 'Не выбрано'}
+Дата заселения: ${calendar || 'Не указана'}
+Город заселения: ${city || 'Не указан'}
+Дополнительные пожелания: ${abstracts || 'Нет'}
+Подписка на рассылку: ${mailing || 'Не указано'}
+=====================================\n`;
+
+    // Записываем данные в файл
+    fs.writeFile(filePath, dataToWrite, err => {
+        if (err) {
+            console.error('Ошибка при записи данных:', err);
+            return res.status(500).json({ error: 'Ошибка при сохранении данных' });
+        }
+        
+        res.status(200).json({ 
+            message: 'Данные успешно отправлены. Хотите просмотреть файл?',
+            fileName: fileName
+        });
     });
 });
 

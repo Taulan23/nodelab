@@ -269,8 +269,11 @@
                 
                 const result = await response.json();
                 if (response.ok) {
-                    // Показываем alert вместо уведомления
-                    alert(result.message);
+                    // Показываем диалог с предложением просмотреть файл
+                    if (confirm(result.message)) {
+                        // Если пользователь нажал "OK", запускаем скачивание
+                        document.getElementById('downloadBtn').click();
+                    }
                     e.target.reset();
                 } else {
                     throw new Error('Ошибка при сохранении данных');
