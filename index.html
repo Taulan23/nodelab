@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Бронирование номера</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 0 20px;
+        }
+
+        h1 {
+            text-align: center;
+            text-transform: uppercase;
+        }
+
+        form {
+            margin-top: 20px;
+        }
+
+        label {
+            display: block;
+            margin-top: 10px;
+        }
+
+        input[type="text"],
+        input[type="password"],
+        input[type="email"],
+        select,
+        textarea {
+            width: 200px;
+            padding: 5px;
+            margin: 5px 0;
+        }
+
+        fieldset {
+            margin: 15px 0;
+            padding: 10px;
+            border: 1px solid #ccc;
+        }
+
+        legend {
+            padding: 0 5px;
+        }
+
+        .button-group {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        /* Стили для уведомлений */
+        #notifications {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+
+        .notification {
+            padding: 15px 20px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            color: white;
+            animation: slideIn 0.5s ease-in-out;
+            text-align: center;
+            background-color: #4CAF50;
+        }
+
+        .notification.error {
+            background-color: #f44336;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); }
+            to { transform: translateX(0); }
+        }
+
+        .fade-out {
+            animation: fadeOut 0.5s ease-in-out;
+        }
+
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+
+        .success-text {
+            color: green;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div id="notifications"></div>
+
+    <h1>Бронирование номера в гостинице</h1>
+    
+    <form id="bookingForm" action="/submit" method="POST">
+        <div>
+            <label>Имя<em>*</em></label>
+            <input type="text" name="userName" required placeholder="ФИО">
+        </div>
+
+        <div>
+            <label>Пароль<em>*</em></label>
+            <input type="password" name="pass" required placeholder="***">
+        </div>
+
+        <div>
+            <label>Email</label>
+            <input type="email" name="email" placeholder="123qwe@gmail.com">
+        </div>
+
+        <div>
+            <label>Количество человек</label>
+            <select name="people" size="3">
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="Другое">Другое</option>
+            </select>
+        </div>
+
+        <fieldset>
+            <legend>Выберите тип номера</legend>
+            <div>
+                <input type="radio" name="room" id="standard" value="Стандартный">
+                <label for="standard">Стандартный</label>
+            </div>
+            <div>
+                <input type="radio" name="room" id="family" value="Семейный">
+                <label for="family">Семейный</label>
+            </div>
+            <div>
+                <input type="radio" name="room" id="business" value="Бизнес">
+                <label for="business">Бизнес</label>
+            </div>
+        </fieldset>
+
+        <fieldset>
+            <legend>Выберите услуги в номер</legend>
+            <div>
+                <input type="checkbox" name="services" id="tv" value="Телевизор">
+                <label for="tv">Телевизор</label>
+            </div>
+            <div>
+                <input type="checkbox" name="services" id="cleaning" value="Уборка в номере">
+                <label for="cleaning">Уборка в номере</label>
+            </div>
+            <div>
+                <input type="checkbox" name="services" id="minibar" value="Мини-бар">
+                <label for="minibar">Мини-бар</label>
+            </div>
+        </fieldset>
+
+        <fieldset>
+            <legend>Выберите питание</legend>
+            <div>
+                <input type="checkbox" name="meal" id="breakfast" value="Завтрак">
+                <label for="breakfast">Завтрак</label>
+            </div>
+            <div>
+                <input type="checkbox" name="meal" id="lunch" value="Обед">
+                <label for="lunch">Обед</label>
+            </div>
+            <div>
+                <input type="checkbox" name="meal" id="dinner" value="Ужин">
+                <label for="dinner">Ужин</label>
+            </div>
+        </fieldset>
+
+        <div>
+            <label>Выберите дату заселения</label>
+            <input type="date" name="calendar">
+        </div>
+
+        <div>
+            <label>Выберите город заселения</label>
+            <select name="city">
+                <option value="" disabled selected>Выберите город</option>
+                <option value="Москва">Москва</option>
+                <option value="Санкт-Петербург">Санкт-Петербург</option>
+                <option value="Воронеж">Воронеж</option>
+                <option value="Сочи">Сочи</option>
+                <option value="Анапа">Анапа</option>
+            </select>
+        </div>
+
+        <div>
+            <label>Дополнительные пожелания</label>
+            <textarea name="abstracts" rows="3" cols="50">Ничего</textarea>
+        </div>
+
+        <div>
+            <label>Хотите ли вы получать рассылку?</label>
+            <div>
+                <input type="radio" name="mailing" id="yes" value="Да">
+                <label for="yes">Согласен</label>
+            </div>
+            <div>
+                <input type="radio" name="mailing" id="no" value="Нет">
+                <label for="no">Не согласен</label>
+            </div>
+        </div>
+
+        <div class="button-group">
+            <button type="submit">Отправить</button>
+            <button type="button" id="clearBtn">Очистить</button>
+            <button type="button" id="downloadBtn">Скачать данные</button>
+        </div>
+    </form>
+
+    <h1>Загрузите файл .7z</h1>
+    <form id="uploadForm" action="/upload" method="post" enctype="multipart/form-data">
+        <label>Выберите файл для загрузки:</label>
+        <input type="file" name="file" accept=".7z">
+        <button type="submit">Отправить</button>
+    </form>
+
+    <script>
+        function showNotification(message, type = 'success') {
+            const notifications = document.getElementById('notifications');
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+
+            notifications.appendChild(notification);
+
+            // Автоматически удаляем уведомление через 5 секунд
+            setTimeout(() => {
+                if (notification.parentElement) {
+                    notification.classList.add('fade-out');
+                    setTimeout(() => notification.remove(), 500);
+                }
+            }, 5000);
+        }
+
+        // Обработка отправки формы бронирования
+        document.getElementById('bookingForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            try {
+                const formData = new FormData(e.target);
+                const response = await fetch('/submit', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: new URLSearchParams(formData).toString()
+                });
+                
+                const result = await response.json();
+                if (response.ok) {
+                    // Показываем alert вместо уведомления
+                    alert(result.message);
+                    e.target.reset();
+                } else {
+                    throw new Error('Ошибка при сохранении данных');
+                }
+            } catch (error) {
+                alert(error.message);
+            }
+        });
+
+        // Обработка загрузки файла
+        document.getElementById('uploadForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            try {
+                const formData = new FormData(e.target);
+                const response = await fetch('/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                if (response.ok) {
+                    showNotification(result.message);
+                    // Очищаем форму после успешной загрузки
+                    e.target.reset();
+                } else {
+                    throw new Error(result.error || 'Ошибка при загрузке файла');
+                }
+            } catch (error) {
+                showNotification(error.message, 'error');
+            }
+        });
+
+        // Изменяем обработчик кнопки скачивания
+        document.getElementById('downloadBtn').addEventListener('click', async () => {
+            try {
+                // Собираем данные формы
+                const formData = new FormData(document.getElementById('bookingForm'));
+                const queryString = new URLSearchParams(formData).toString();
+                
+                // Отправляем запрос на скачивание с данными формы
+                const response = await fetch(`/download?${queryString}`, {
+                    method: 'GET'
+                });
+
+                if (!response.ok) {
+                    throw new Error('Ошибка при скачивании файла');
+                }
+
+                const blob = await response.blob();
+                const downloadUrl = window.URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = downloadUrl;
+                link.download = 'booking_data.txt';
+                
+                document.body.appendChild(link);
+                link.click();
+                
+                setTimeout(() => {
+                    window.URL.revokeObjectURL(downloadUrl);
+                    document.body.removeChild(link);
+                    // Показываем только сообщение об успешном скачивании
+                    alert('Файл успешно скачан');
+                }, 100);
+
+            } catch (error) {
+                alert(error.message);
+            }
+        });
+
+        // Добавляем обработчик для кнопки очистки
+        document.getElementById('clearBtn').addEventListener('click', () => {
+            document.getElementById('bookingForm').reset();
+            alert('Форма очищена');
+        });
+    </script>
+</body>
+</html> 
